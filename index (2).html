@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python Coding Test</title>
+<style>
+  :root { --bg:#f5f6fa; --card:#fff; --ink:#1f2430; --muted:#6b7280; --brand:#3b6cf6; --ok:#16a34a; --bad:#dc2626; --warn:#d97706; --line:#e5e7eb; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--brand); color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+  header h1 { font-size:20px; margin:0; }
+  #engine { font-size:13px; opacity:.9; }
+  main { max-width:1100px; margin:20px auto; padding:0 14px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:16px; }
+  .hidden { display:none !important; }
+  input[type=text] { width:100%; padding:12px; font-size:16px; border:1px solid var(--line); border-radius:8px; }
+  button { cursor:pointer; border:0; border-radius:8px; padding:10px 18px; font-size:15px; font-weight:600; }
+  .primary { background:var(--brand); color:#fff; }
+  .secondary { background:#e8ecfb; color:var(--brand); }
+  .danger { background:var(--ok); color:#fff; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .rules li { margin:6px 0; }
+  .banner { background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; padding:10px 14px; border-radius:8px; margin-bottom:14px; font-size:14px; }
+  .err { color:var(--bad); margin-top:8px; font-size:14px; }
+  #testLayout { display:grid; grid-template-columns:200px 1fr; gap:16px; }
+  @media (max-width:760px){ #testLayout { grid-template-columns:1fr; } }
+  #qNav { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; align-content:start; }
+  @media (min-width:761px){ #qNav { grid-template-columns:repeat(3,1fr); } }
+  .qbtn { padding:8px 0; background:#eef0f5; color:var(--ink); border:2px solid transparent; }
+  .qbtn.answered { background:#dbeafe; }
+  .qbtn.pass { background:#dcfce7; }
+  .qbtn.fail { background:#fee2e2; }
+  .qbtn.current { border-color:var(--brand); }
+  textarea#editor { width:100%; min-height:300px; font-family:Consolas,Menlo,monospace; font-size:14px; line-height:1.5; padding:12px; border:1px solid var(--line); border-radius:8px; background:#0f172a; color:#e2e8f0; tab-size:4; resize:vertical; }
+  .sig { font-family:Consolas,Menlo,monospace; background:#eef2ff; padding:2px 8px; border-radius:6px; }
+  .tag { display:inline-block; font-size:12px; background:#eef0f5; border-radius:20px; padding:2px 10px; margin-right:6px; }
+  #output { margin-top:12px; font-size:14px; }
+  #output .row { padding:3px 0; }
+  .ok { color:var(--ok); } .bad { color:var(--bad); } .warn { color:var(--warn); }
+  pre { background:#f3f4f6; padding:8px; border-radius:6px; overflow:auto; margin:6px 0; }
+  table { width:100%; border-collapse:collapse; font-size:15px; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); }
+  th { background:#f3f4f6; }
+  .pill { padding:2px 10px; border-radius:20px; font-size:13px; font-weight:600; }
+  .pill.pass { background:#dcfce7; color:var(--ok); } .pill.fail { background:#fee2e2; color:var(--bad); }
+  .bigscore { font-size:38px; font-weight:800; }
+  .topbar { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px; }
+  .small { font-size:13px; color:var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>🐍 Python Coding Test</h1>
+  <span id="engine">Python engine loading...</span>
+</header>
+<main>
+  <div id="fbWarn" class="banner hidden">Firebase abhi configure nahi hai. index.html me <b>firebaseConfig</b> paste karo, tab tak results sirf is browser me dikhenge, leaderboard me save nahi honge.</div>
+
+  <!-- START SCREEN -->
+  <section id="startScreen">
+    <div class="card">
+      <h2 style="margin-top:0">Test shuru karne se pehle</h2>
+      <ul class="rules">
+        <li>Total <b>18 coding questions</b>, har question <b>5 marks</b> ka (total 90).</li>
+        <li>Pass hone ke liye kam se kam <b>12 questions ka logic sahi</b> hona chahiye, warna Fail.</li>
+        <li>Har question me function ka diya hua naam use karo. Logic aap kisi bhi tarike se likh sakte ho.</li>
+        <li>Marks in cheezon ke milte hain: <b>def function</b>, <b>docstring</b>, <b>try/except</b>, <b>if __name__ == "__main__":</b> aur <b>sahi logic</b>.</li>
+        <li><b>Ek naam se sirf ek attempt</b> milega. Apna sahi naam likho.</li>
+      </ul>
+      <label for="nameInput"><b>Aapka naam</b></label>
+      <input type="text" id="nameInput" maxlength="40" placeholder="e.g. Priyam Gupta" autocomplete="off">
+      <div id="startErr" class="err"></div>
+      <p><button class="primary" id="startBtn">Start Test</button>
+         <button class="secondary" id="lbBtn">Leaderboard dekho</button></p>
+    </div>
+    <div class="card hidden" id="startLB"></div>
+  </section>
+
+  <!-- TEST SCREEN -->
+  <section id="testScreen" class="hidden">
+    <div class="topbar">
+      <div><b id="who"></b> <span class="small" id="progress"></span></div>
+      <button class="danger" id="submitBtn">Submit Test</button>
+    </div>
+    <div id="testLayout">
+      <div class="card"><div id="qNav"></div></div>
+      <div class="card">
+        <h3 id="qTitle" style="margin-top:0"></h3>
+        <p id="qText"></p>
+        <p><span class="tag">Function:</span><span class="sig" id="qSig"></span></p>
+        <textarea id="editor" spellcheck="false" placeholder="Yahan Python code likho..."></textarea>
+        <p style="margin:12px 0 0">
+          <button class="primary" id="runBtn">▶ Run & Check</button>
+          <button class="secondary" id="prevBtn">← Prev</button>
+          <button class="secondary" id="nextBtn">Next →</button>
+        </p>
+        <details open style="margin-top:14px">
+          <summary><b>💻 Console (Run Program)</b></summary>
+          <div class="small" style="margin:6px 0">Program <code>input()</code> maangta ho to yahan values likho (ek line = ek input). Ye button pura program chalata hai, jaise <code>python file.py</code>.</div>
+          <textarea id="stdin" rows="2" style="width:100%;font-family:Consolas,Menlo,monospace;padding:8px;border:1px solid var(--line);border-radius:8px" placeholder="Input (optional)"></textarea>
+          <p style="margin:8px 0"><button class="secondary" id="progBtn">▶ Run Program</button></p>
+          <pre id="consoleOut" style="background:#0f172a;color:#e2e8f0;min-height:60px;white-space:pre-wrap">Output yahan dikhega...</pre>
+        </details>
+        <div id="output"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT SCREEN -->
+  <section id="resultScreen" class="hidden">
+    <div class="card" id="resultCard"></div>
+    <div class="card" id="resultLB"></div>
+  </section>
+</main>
+
+<script type="text/plain" id="graderPy">
+import ast, json, sys, io, copy, builtins
+
+def _same(a, b):
+    if isinstance(b, (int, float)) and isinstance(a, (int, float)):
+        return abs(a - b) < 1e-6
+    if isinstance(b, (list, tuple)) and isinstance(a, (list, tuple)):
+        return len(a) == len(b) and all(_same(x, y) for x, y in zip(a, b))
+    if isinstance(b, dict) and isinstance(a, dict):
+        return set(a.keys()) == set(b.keys()) and all(_same(a[k], b[k]) for k in b)
+    if isinstance(a, str) and isinstance(b, str):
+        return a.strip() == b.strip()
+    return a == b
+
+def structure(code):
+    r = {"has_def": False, "has_doc": False, "has_exc": False, "has_main": False, "syntax": None}
+    if not code.strip():
+        return json.dumps(r)
+    try:
+        tree = ast.parse(code)
+    except SyntaxError as e:
+        r["syntax"] = "SyntaxError: %s (line %s)" % (e.msg, e.lineno)
+        return json.dumps(r)
+    funcs = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+    r["has_def"] = len(funcs) > 0
+    r["has_doc"] = any(ast.get_docstring(f) for f in funcs)
+    r["has_exc"] = any(isinstance(n, ast.Try) for n in ast.walk(tree))
+    for n in tree.body:
+        if (isinstance(n, ast.If) and isinstance(n.test, ast.Compare)
+                and isinstance(n.test.left, ast.Name) and n.test.left.id == "__name__"
+                and any(isinstance(c, ast.Constant) and c.value == "__main__" for c in n.test.comparators)):
+            r["has_main"] = True
+    return json.dumps(r)
+
+def logic(code, fname, tests_json):
+    tests = json.loads(tests_json)
+    r = {"passed": 0, "total": len(tests), "error": None, "fail": None, "out": ""}
+    if not code.strip():
+        r["error"] = "Code khali hai"
+        return json.dumps(r)
+    old_in, old_out = builtins.input, sys.stdout
+    buf = io.StringIO()
+    builtins.input = lambda *a, **k: "1"
+    sys.stdout = buf
+    try:
+        ns = {"__name__": "solution"}
+        exec(compile(code, "<student>", "exec"), ns)
+        fn = ns.get(fname)
+        if not callable(fn):
+            r["error"] = "Function '%s' nahi mila" % fname
+        else:
+            for t in tests:
+                try:
+                    got = fn(*copy.deepcopy(t["a"]))
+                    ok = _same(got, t["e"])
+                    if ok and t.get("o") and isinstance(got, dict):
+                        ok = list(got.keys()) == list(t["e"].keys())
+                    if ok:
+                        r["passed"] += 1
+                    elif r["fail"] is None:
+                        r["fail"] = {"a": t["a"], "e": t["e"], "got": repr(got)}
+                except BaseException as ex:
+                    if r["fail"] is None:
+                        r["fail"] = {"a": t["a"], "e": t["e"], "got": "Error: %s" % ex}
+    except BaseException as ex:
+        r["error"] = "%s: %s" % (type(ex).__name__, ex)
+    finally:
+        sys.stdout = old_out
+        builtins.input = old_in
+    r["out"] = buf.getvalue()[:300]
+    return json.dumps(r)
+
+def run_program(code, stdin_text):
+    import traceback
+    lines = iter(stdin_text.split("\n")) if stdin_text else iter([])
+    def fake_input(prompt=""):
+        sys.stdout.write(str(prompt))
+        try:
+            v = next(lines)
+        except StopIteration:
+            raise EOFError("Input box me value nahi hai")
+        sys.stdout.write(v + "\n")
+        return v
+    old_in, old_out, old_err = builtins.input, sys.stdout, sys.stderr
+    buf = io.StringIO()
+    builtins.input = fake_input
+    sys.stdout = buf
+    sys.stderr = buf
+    err = None
+    try:
+        exec(compile(code, "<student>", "exec"), {"__name__": "__main__"})
+    except BaseException as ex:
+        line = ""
+        if isinstance(ex, SyntaxError) and ex.lineno:
+            line = " (line %d)" % ex.lineno
+        else:
+            tb = [f for f in traceback.extract_tb(ex.__traceback__) if f.filename == "<student>"]
+            if tb:
+                line = " (line %d)" % tb[-1].lineno
+        err = "%s: %s%s" % (type(ex).__name__, ex, line)
+    finally:
+        sys.stdout, sys.stderr, builtins.input = old_out, old_err, old_in
+    return json.dumps({"out": buf.getvalue()[:5000], "error": err})
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ================= CONFIG ================= */
+// 1) Firebase console se apna web app config yahan paste karo
+const firebaseConfig = {
+  apiKey: "AIzaSyBGUAxh-XbQfKZdMgd59QJ75cGHqrdRTfQ",
+  authDomain: "python-coding-test1-b17ec.firebaseapp.com",
+  projectId: "python-coding-test1-b17ec",
+  storageBucket: "python-coding-test1-b17ec.firebasestorage.app",
+  messagingSenderId: "593946082288",
+  appId: "1:593946082288:web:4ffb8fcaeb16ce54427b35",
+  measurementId: "G-601ER0DXZQ"
+};
+// 2) Marks per question (total 5). Chahe to yahan badal sakte ho.
+const MARKS = { logic: 2, def: 1, doc: 0.5, exc: 0.5, main: 1 };
+const PASS_NEEDED = 12;          // itne questions ka logic sahi hona chahiye
+const TIME_LIMIT_MS = 5000;      // ek run ka max time (infinite loop se bachne ke liye)
+
+/* ================= QUESTIONS ================= */
+const QUESTIONS = [
+ { t:"Reverse a string (loop)", d:"Loop (for/while) use karke string ko ulta karo aur return karo. Built-in [::-1] ke bina likhne ki koshish karo.", fn:"reverse_string", sig:"reverse_string(s)", tests:[{a:["abc"],e:"cba"},{a:[""],e:""},{a:["Python"],e:"nohtyP"}] },
+ { t:"Largest number in a list", d:"List me se sabse bada number return karo.", fn:"find_largest", sig:"find_largest(numbers)", tests:[{a:[[3,9,2]],e:9},{a:[[-5,-2,-9]],e:-2},{a:[[7]],e:7}] },
+ { t:"Prime numbers 100 to 200", d:"start se end tak (dono included) ke saare prime numbers ki list return karo. main block me find_primes(100, 200) print karwao.", fn:"find_primes", sig:"find_primes(start, end)", tests:[{a:[100,200],e:[101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199]},{a:[1,10],e:[2,3,5,7]},{a:[14,16],e:[]}] },
+ { t:"Count vowels", d:"String me kitne vowels (a, e, i, o, u) hain, case ignore karke count return karo.", fn:"count_vowels", sig:"count_vowels(s)", tests:[{a:["Python"],e:1},{a:["AEIOU"],e:5},{a:["xyz"],e:0},{a:["Education"],e:5}] },
+ { t:"Sum of digits", d:"Number ke saare digits ka sum return karo. Example: 123 -> 6", fn:"sum_of_digits", sig:"sum_of_digits(n)", tests:[{a:[123],e:6},{a:[0],e:0},{a:[9999],e:36},{a:[5],e:5}] },
+ { t:"Factorial (recursion)", d:"Recursion use karke n ka factorial return karo. factorial(0) = 1.", fn:"factorial", sig:"factorial(n)", tests:[{a:[5],e:120},{a:[0],e:1},{a:[1],e:1},{a:[7],e:5040}] },
+ { t:"Leap year", d:"Check karo ki year leap year hai ya nahi. True/False return karo.", fn:"is_leap_year", sig:"is_leap_year(year)", tests:[{a:[2000],e:true},{a:[1900],e:false},{a:[2024],e:true},{a:[2023],e:false}] },
+ { t:"Power without ** operator", d:"base ka exponent power nikalo, ** operator ya pow() ke bina (loop ya recursion use karo). Exponent 0 ya usse bada integer hoga.", fn:"power", sig:"power(base, exponent)", tests:[{a:[2,10],e:1024},{a:[5,0],e:1},{a:[3,3],e:27},{a:[7,1],e:7}] },
+ { t:"List of even numbers", d:"1 se n tak (n included) ke saare even numbers ki list return karo.", fn:"generate_even_numbers", sig:"generate_even_numbers(n)", tests:[{a:[10],e:[2,4,6,8,10]},{a:[1],e:[]},{a:[7],e:[2,4,6]}] },
+ { t:"Reverse words in a sentence", d:"Sentence ke words ka order ulta karo (har word seedha rahe). Example: 'I love python' -> 'python love I'", fn:"reverse_words", sig:"reverse_words(sentence)", tests:[{a:["I love python"],e:"python love I"},{a:["hello world"],e:"world hello"},{a:["one"],e:"one"}] },
+ { t:"Remove whitespace", d:"String se saare spaces/whitespace hata do aur nayi string return karo.", fn:"remove_whitespace", sig:"remove_whitespace(s)", tests:[{a:[" a b  c "],e:"abc"},{a:["hello world"],e:"helloworld"},{a:["a\tb"],e:"ab"}] },
+ { t:"Is list sorted?", d:"Check karo ki list ascending order me sorted hai ya nahi. True/False return karo. Khali list sorted maani jayegi.", fn:"is_sorted", sig:"is_sorted(lst)", tests:[{a:[[1,2,3]],e:true},{a:[[3,1,2]],e:false},{a:[[]],e:true},{a:[[1,1,2]],e:true}] },
+ { t:"Sum of squares of N natural numbers", d:"1 se N tak ke numbers ke squares ka sum return karo. Example: N=3 -> 1+4+9 = 14", fn:"sum_of_squares", sig:"sum_of_squares(n)", tests:[{a:[3],e:14},{a:[1],e:1},{a:[10],e:385}] },
+ { t:"Reverse an integer", d:"Integer ko ulta karke integer hi return karo. Example: 123 -> 321, 1200 -> 21, -45 -> -54", fn:"reverse_integer", sig:"reverse_integer(n)", tests:[{a:[123],e:321},{a:[1200],e:21},{a:[-45],e:-54},{a:[0],e:0}] },
+ { t:"Longest word in a sentence", d:"Sentence me sabse lamba word return karo (koi tie nahi hoga).", fn:"longest_word", sig:"longest_word(sentence)", tests:[{a:["I love python programming"],e:"programming"},{a:["a bb ccc"],e:"ccc"},{a:["hello"],e:"hello"}] },
+ { t:"List of tuples to dictionary", d:"(key, value) wali tuples ki list ko dictionary me convert karke return karo.", fn:"tuples_to_dict", sig:"tuples_to_dict(pairs)", tests:[{a:[[["a",1],["b",2]]],e:{a:1,b:2}},{a:[[]],e:{}},{a:[[["x",10]]],e:{x:10}}] },
+ { t:"Sort dictionary by key", d:"Dictionary ko keys ke hisaab se sort karke nayi dictionary return karo (key order sorted hona chahiye).", fn:"sort_dict_by_key", sig:"sort_dict_by_key(d)", tests:[{a:[{b:2,a:1,c:3}],e:{a:1,b:2,c:3},o:true},{a:[{z:9,y:8}],e:{y:8,z:9},o:true},{a:[{}],e:{},o:true}] },
+ { t:"LCM of two numbers", d:"Do numbers ka LCM return karo.", fn:"lcm", sig:"lcm(a, b)", tests:[{a:[4,6],e:12},{a:[5,7],e:35},{a:[12,18],e:36},{a:[10,10],e:10}] }
+];
+const TOTAL_Q = QUESTIONS.length;
+const MAX_MARKS = TOTAL_Q * (MARKS.logic + MARKS.def + MARKS.doc + MARKS.exc + MARKS.main);
+
+/* ================= FIREBASE ================= */
+let db = null;
+const fbOk = !firebaseConfig.apiKey.startsWith("PASTE");
+if (fbOk) { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); }
+else document.getElementById("fbWarn").classList.remove("hidden");
+
+/* ================= PYTHON WORKER ================= */
+const graderSrc = document.getElementById("graderPy").textContent;
+const WORKER_SRC = `
+const GRADER = ${JSON.stringify(graderSrc)};
+let py;
+(async () => {
+  try {
+    importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js");
+    py = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/" });
+    py.runPython(GRADER);
+    postMessage({ ready: true });
+  } catch (err) {
+    postMessage({ fail: String((err && err.message) || err) });
+  }
+})();
+onmessage = (e) => {
+  const d = e.data;
+  try {
+    if (!py) throw new Error("Python engine ready nahi hai");
+    const f = py.globals.get(d.kind);
+    const out = d.kind === "structure" ? f(d.code) : d.kind === "run_program" ? f(d.code, d.stdin) : f(d.code, d.fname, d.tests);
+    f.destroy();
+    postMessage({ id: d.id, out });
+  } catch (err) {
+    postMessage({ id: d.id, out: JSON.stringify({ error: String(err), out: "", passed: 0, total: 0, syntax: String(err) }) });
+  }
+};`;
+let worker = null, readyP = null, seq = 0, engineReady = false;
+const engineEl = document.getElementById("engine");
+function setEngine(t) { engineEl.textContent = t; }
+function startWorker() {
+  engineReady = false;
+  setEngine("⏳ Python engine loading... (pehli baar 10-30 second lag sakte hain)");
+  readyP = new Promise((res, rej) => {
+    let w;
+    try { w = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], { type: "text/javascript" }))); }
+    catch (e) { rej(new Error("Worker start nahi hua: " + e.message)); return; }
+    worker = w;
+    const timer = setTimeout(() => rej(new Error("Engine load hone me bahut time lag gaya. Internet check karo aur page refresh karo.")), 90000);
+    w.addEventListener("message", e => {
+      if (e.data && e.data.ready) { clearTimeout(timer); engineReady = true; setEngine("Python engine ready ✅"); res(); }
+      else if (e.data && e.data.fail) { clearTimeout(timer); rej(new Error("Pyodide load nahi hua: " + e.data.fail)); }
+    });
+    w.addEventListener("error", e => { clearTimeout(timer); rej(new Error("Worker error: " + (e.message || "unknown"))); });
+  });
+  readyP.catch(err => { setEngine("❌ " + err.message); worker = null; });
+}
+function callWorker(msg, timeout) {
+  if (!worker) startWorker();
+  return readyP.then(() => new Promise(resolve => {
+    const id = ++seq;
+    const w = worker;
+    const timer = timeout ? setTimeout(() => { w.terminate(); worker = null; engineReady = false; resolve(null); }, timeout) : null;
+    const h = e => { if (e.data && e.data.id === id) { clearTimeout(timer); w.removeEventListener("message", h); resolve(JSON.parse(e.data.out)); } };
+    w.addEventListener("message", h);
+    w.postMessage({ id, ...msg });
+  }));
+}
+async function gradeCode(code, q) {
+  const s = await callWorker({ kind: "structure", code }, 0);
+  const l = await callWorker({ kind: "logic", code, fname: q.fn, tests: JSON.stringify(q.tests) }, TIME_LIMIT_MS);
+  const logic = l || { passed: 0, total: q.tests.length, error: "Time limit exceeded (infinite loop to nahi?)", fail: null, out: "" };
+  const allPass = logic.total > 0 && logic.passed === logic.total;
+  const half = logic.total > 0 && logic.passed * 2 >= logic.total;
+  let marks = 0;
+  if (s.has_def) marks += MARKS.def;
+  if (s.has_doc) marks += MARKS.doc;
+  if (s.has_exc) marks += MARKS.exc;
+  if (s.has_main) marks += MARKS.main;
+  if (allPass) marks += MARKS.logic; else if (half) marks += MARKS.logic / 2;
+  return { s, logic, correct: allPass, marks };
+}
+
+/* ================= STATE ================= */
+const $ = id => document.getElementById(id);
+let state = { name: "", docId: "", codes: Array(TOTAL_Q).fill(""), status: Array(TOTAL_Q).fill(""), cur: 0, submitted: false };
+const keyOf = name => name.trim().toLowerCase().replace(/\s+/g, " ").replace(/[^a-z0-9\u0900-\u097F ]/g, "").replace(/ /g, "_");
+const saveLocal = () => { try { localStorage.setItem("pytest_" + state.docId, JSON.stringify({ codes: state.codes, name: state.name })); } catch (e) {} };
+
+function show(id) { ["startScreen", "testScreen", "resultScreen"].forEach(s => $(s).classList.toggle("hidden", s !== id)); window.scrollTo(0, 0); }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* ================= LEADERBOARD ================= */
+function renderBoard(el, rows, me) {
+  if (!rows.length) { el.innerHTML = "<h3 style='margin-top:0'>Leaderboard</h3><p class='small'>Abhi tak kisi ne test nahi diya.</p>"; return; }
+  el.innerHTML = "<h3 style='margin-top:0'>🏆 Leaderboard</h3><table><tr><th>#</th><th>Naam</th><th>Marks</th><th>Sahi Q</th><th>Result</th></tr>" +
+    rows.map((r, i) => `<tr${me && r.id === me ? ' style="background:#eef2ff"' : ""}><td>${i + 1}</td><td>${esc(r.name)}</td><td>${r.marks} / ${r.max}</td><td>${r.correct} / ${r.totalQ}</td><td><span class="pill ${r.passed ? "pass" : "fail"}">${r.passed ? "PASS" : "FAIL"}</span></td></tr>`).join("") + "</table>";
+}
+let unsub = null;
+function watchBoard(el, me) {
+  if (!db) { el.innerHTML = "<p class='small'>Firebase configure karne ke baad leaderboard yahan dikhega.</p>"; return; }
+  if (unsub) unsub();
+  unsub = db.collection("results").orderBy("marks", "desc").onSnapshot(snap => {
+    renderBoard(el, snap.docs.map(d => ({ id: d.id, ...d.data() })), me);
+  }, err => { el.innerHTML = "<p class='err'>Leaderboard load nahi hua: " + esc(err.message) + "</p>"; });
+}
+$("lbBtn").onclick = () => { $("startLB").classList.remove("hidden"); watchBoard($("startLB")); };
+
+/* ================= START ================= */
+$("startBtn").onclick = async () => {
+  const name = $("nameInput").value.trim().replace(/\s+/g, " ");
+  const err = $("startErr"); err.textContent = "";
+  if (name.length < 2) { err.textContent = "Please apna poora naam likho."; return; }
+  const docId = keyOf(name);
+  if (!docId) { err.textContent = "Naam me letters ya numbers hone chahiye."; return; }
+  $("startBtn").disabled = true;
+  try {
+    if (db) {
+      const snap = await db.collection("results").doc(docId).get();
+      if (snap.exists) { err.textContent = "Is naam se test pehle hi diya ja chuka hai. Ek naam se sirf ek attempt allowed hai."; $("startBtn").disabled = false; return; }
+    } else if (localStorage.getItem("pydone_" + docId)) {
+      err.textContent = "Is browser me ye naam pehle hi test de chuka hai."; $("startBtn").disabled = false; return;
+    }
+  } catch (e) { err.textContent = "Check nahi ho paya: " + e.message; $("startBtn").disabled = false; return; }
+  state.name = name; state.docId = docId;
+  try { const saved = JSON.parse(localStorage.getItem("pytest_" + docId) || "null"); if (saved && saved.codes) state.codes = saved.codes; } catch (e) {}
+  $("who").textContent = "👤 " + name;
+  buildNav(); gotoQ(0); show("testScreen");
+  $("startBtn").disabled = false;
+};
+
+/* ================= TEST UI ================= */
+function buildNav() {
+  $("qNav").innerHTML = QUESTIONS.map((_, i) => `<button class="qbtn" data-i="${i}">${i + 1}</button>`).join("");
+  $("qNav").querySelectorAll(".qbtn").forEach(b => b.onclick = () => gotoQ(+b.dataset.i));
+}
+function refreshNav() {
+  $("qNav").querySelectorAll(".qbtn").forEach((b, i) => {
+    b.className = "qbtn" + (i === state.cur ? " current" : "") + (state.status[i] ? " " + state.status[i] : state.codes[i].trim() ? " answered" : "");
+  });
+  const done = state.codes.filter(c => c.trim()).length;
+  $("progress").textContent = `· ${done}/${TOTAL_Q} attempted`;
+}
+function gotoQ(i) {
+  state.cur = i;
+  const q = QUESTIONS[i];
+  $("qTitle").textContent = `Q${i + 1}. ${q.t}  (5 marks)`;
+  $("qText").textContent = q.d;
+  $("qSig").textContent = q.sig;
+  $("editor").value = state.codes[i];
+  $("output").innerHTML = "";
+  $("consoleOut").textContent = "Output yahan dikhega...";
+  $("stdin").value = "";
+  $("prevBtn").disabled = i === 0;
+  $("nextBtn").disabled = i === TOTAL_Q - 1;
+  refreshNav();
+}
+$("editor").addEventListener("input", e => { state.codes[state.cur] = e.target.value; state.status[state.cur] = ""; saveLocal(); refreshNav(); });
+$("editor").addEventListener("keydown", e => {
+  if (e.key === "Tab") { e.preventDefault(); const t = e.target, s = t.selectionStart; t.value = t.value.slice(0, s) + "    " + t.value.slice(t.selectionEnd); t.selectionStart = t.selectionEnd = s + 4; t.dispatchEvent(new Event("input")); }
+});
+$("prevBtn").onclick = () => gotoQ(state.cur - 1);
+$("nextBtn").onclick = () => gotoQ(state.cur + 1);
+
+$("progBtn").onclick = async () => {
+  const c = $("consoleOut");
+  $("progBtn").disabled = true;
+  c.textContent = engineReady ? "Chal raha hai..." : "Python engine load ho raha hai, thoda wait karo...";
+  try {
+    const r = await callWorker({ kind: "run_program", code: state.codes[state.cur], stdin: $("stdin").value }, TIME_LIMIT_MS);
+    if (!r) c.textContent = "⏱ Time limit exceeded (infinite loop to nahi?)";
+    else c.textContent = ((r.out || "") + (r.error ? "\n❌ " + r.error : "")) || "(koi output nahi, print() use karo)";
+  } catch (err) { c.textContent = "❌ " + err.message; }
+  $("progBtn").disabled = false;
+};
+
+function tick(ok, label) { return `<div class="row ${ok ? "ok" : "bad"}">${ok ? "✔" : "✘"} ${label}</div>`; }
+$("runBtn").onclick = async () => {
+  const i = state.cur, q = QUESTIONS[i], out = $("output");
+  $("runBtn").disabled = true; out.innerHTML = "<div class='small'>Check ho raha hai...</div>";
+  let r;
+  try { r = await gradeCode(state.codes[i], q); }
+  catch (err) { out.innerHTML = `<div class="row bad">❌ ${esc(err.message)}</div>`; $("runBtn").disabled = false; return; }
+  state.status[i] = r.correct ? "pass" : "fail";
+  let h = "";
+  if (r.s.syntax) h += `<div class="row bad">${esc(r.s.syntax)}</div>`;
+  h += tick(r.s.has_def, `def function (+${MARKS.def})`) + tick(r.s.has_doc, `docstring (+${MARKS.doc})`) + tick(r.s.has_exc, `try/except (+${MARKS.exc})`) + tick(r.s.has_main, `if __name__ == "__main__" (+${MARKS.main})`);
+  h += tick(r.correct, `Logic: ${r.logic.passed}/${r.logic.total} test cases pass (+${MARKS.logic})`);
+  if (r.logic.error) h += `<div class="row warn">${esc(r.logic.error)}</div>`;
+  if (r.logic.fail) h += `<div class="row warn">Fail hua: input <code>${esc(JSON.stringify(r.logic.fail.a))}</code>, expected <code>${esc(JSON.stringify(r.logic.fail.e))}</code>, mila <code>${esc(r.logic.fail.got)}</code></div>`;
+  if (r.logic.out) h += `<div class="small">Print output:</div><pre>${esc(r.logic.out)}</pre>`;
+  h += `<div class="row"><b>Is question ke marks: ${r.marks} / 5</b></div>`;
+  out.innerHTML = h; refreshNav(); $("runBtn").disabled = false;
+};
+
+/* ================= SUBMIT ================= */
+$("submitBtn").onclick = async () => {
+  const done = state.codes.filter(c => c.trim()).length;
+  if (!confirm(`Test submit karna hai? Aapne ${done}/${TOTAL_Q} questions attempt kiye hain. Submit ke baad dobara attempt nahi milega.`)) return;
+  $("submitBtn").disabled = true; $("runBtn").disabled = true;
+  const results = [];
+  try {
+    for (let i = 0; i < TOTAL_Q; i++) {
+      $("progress").textContent = `· Checking Q${i + 1}/${TOTAL_Q}...`;
+      results.push(await gradeCode(state.codes[i], QUESTIONS[i]));
+    }
+  } catch (err) {
+    alert("Checking fail hui: " + err.message + "\nPage refresh kiye bina dobara Submit dabao.");
+    $("submitBtn").disabled = false; $("runBtn").disabled = false; refreshNav();
+    return;
+  }
+  const marks = results.reduce((a, r) => a + r.marks, 0);
+  const correct = results.filter(r => r.correct).length;
+  const passed = correct >= PASS_NEEDED;
+  const payload = { name: state.name, marks, max: MAX_MARKS, correct, totalQ: TOTAL_Q, passed };
+  let saveMsg = "";
+  try {
+    if (db) {
+      await db.collection("results").doc(state.docId).set({ ...payload, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      // code bhi save hota hai taaki admin baad me review kar sake (public read nahi hai)
+      db.collection("submissions").doc(state.docId).set({ name: state.name, codes: state.codes, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
+      saveMsg = "✅ Result leaderboard me save ho gaya.";
+    } else { saveMsg = "⚠️ Firebase configure nahi hai, result sirf yahin dikh raha hai."; }
+    localStorage.setItem("pydone_" + state.docId, "1");
+  } catch (e) { saveMsg = "❌ Result save nahi ho paya: " + e.message + " (Agar naam pehle se use ho chuka hai to ye normal hai.)"; }
+
+  const rows = results.map((r, i) => `<tr><td>Q${i + 1}. ${esc(QUESTIONS[i].t)}</td><td>${r.s.has_def ? "✔" : "✘"}</td><td>${r.s.has_doc ? "✔" : "✘"}</td><td>${r.s.has_exc ? "✔" : "✘"}</td><td>${r.s.has_main ? "✔" : "✘"}</td><td>${r.correct ? "✔" : "✘"} (${r.logic.passed}/${r.logic.total})</td><td><b>${r.marks}</b>/5</td></tr>`).join("");
+  $("resultCard").innerHTML = `
+    <div class="topbar"><div><div class="small">${esc(state.name)}</div><div class="bigscore">${marks} / ${MAX_MARKS}</div></div>
+    <div style="text-align:right"><span class="pill ${passed ? "pass" : "fail"}" style="font-size:18px;padding:6px 18px">${passed ? "PASS 🎉" : "FAIL"}</span>
+    <div class="small" style="margin-top:6px">${correct} / ${TOTAL_Q} questions sahi (pass ke liye ${PASS_NEEDED} chahiye)</div></div></div>
+    <p class="small">${saveMsg}</p>
+    <div style="overflow:auto"><table><tr><th>Question</th><th>def</th><th>docstring</th><th>try/except</th><th>main</th><th>logic</th><th>marks</th></tr>${rows}</table></div>`;
+  show("resultScreen");
+  watchBoard($("resultLB"), state.docId);
+};
+
+startWorker();
+</script>
+</body>
+</html>
